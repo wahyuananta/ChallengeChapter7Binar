@@ -8,22 +8,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.coder.challengechapter5binar.R
-import com.coder.challengechapter5binar.databinding.FragmentRegisterBinding
-import com.coder.challengechapter5binar.room.UserEntity
-import com.coder.challengechapter5binar.room.UserRepository
+import com.coder.challengechapter7binar.R
+import com.coder.challengechapter7binar.data.room.entity.UserEntity
 import com.coder.challengechapter7binar.databinding.FragmentRegisterBinding
+import com.coder.challengechapter7binar.ui.home.HomeViewModel
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class RegisterFragment : Fragment() {
     private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding!!
-    private lateinit var repository: UserRepository
+    private val homeViewModel: HomeViewModel by viewModels()
+//    private lateinit var repository: UserRepository
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,7 +35,7 @@ class RegisterFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        repository = UserRepository(requireContext())
+//        repository = UserRepository(requireContext())
 
         binding.btnRegister.setOnClickListener {
             val imageUri: Uri = Uri.parse(
@@ -68,24 +67,36 @@ class RegisterFragment : Fragment() {
                 }
                 else -> {
                     val user = UserEntity(null, username.toString(), email.toString(), password.toString(), imageUri.toString())
-
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val result= repository.addUser(user)
-                        runBlocking(Dispatchers.Main) {
-                            if (result != 0.toLong()) {
-                                Toast.makeText(activity, "Registrasi berhasil", Toast.LENGTH_SHORT).show()
-                            } else {
-                                val snackbar = Snackbar.make(it,"Registrasi gagal, coba lagi nanti!", Snackbar.LENGTH_INDEFINITE)
-                                snackbar.setAction("Oke") {
-                                    snackbar.dismiss()
-                                }
-                                snackbar.show()
+                    homeViewModel.addUser(user)
+                    homeViewModel.resultRegister.observe(viewLifecycleOwner) {
+                        if (it != 0.toLong()) {
+                            Toast.makeText(activity, "Registrasi berhasil", Toast.LENGTH_SHORT).show()
+                        } else {
+                            val snackbar = Snackbar.make(binding.root,"Registrasi gagal, coba lagi nanti!", Snackbar.LENGTH_INDEFINITE)
+                            snackbar.setAction("Oke") {
+                                snackbar.dismiss()
                             }
+                            snackbar.show()
                         }
                     }
+//                    lifecycleScope.launch(Dispatchers.IO) {
+//                        val result= repository.addUser(user)
+//                        runBlocking(Dispatchers.Main) {
+//                            if (result != 0.toLong()) {
+//                                Toast.makeText(activity, "Registrasi berhasil", Toast.LENGTH_SHORT).show()
+//                            } else {
+//                                val snackbar = Snackbar.make(it,"Registrasi gagal, coba lagi nanti!", Snackbar.LENGTH_INDEFINITE)
+//                                snackbar.setAction("Oke") {
+//                                    snackbar.dismiss()
+//                                }
+//                                snackbar.show()
+//                            }
+//                        }
+//                    }
                     findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
                 }
             }
+
         }
     }
 

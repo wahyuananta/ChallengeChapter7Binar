@@ -6,27 +6,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.coder.challengechapter5binar.R
-import com.coder.challengechapter5binar.databinding.FragmentLoginBinding
-import com.coder.challengechapter5binar.datastore.UserDataStoreManager
-import com.coder.challengechapter5binar.room.UserRepository
-import com.coder.challengechapter5binar.viewmodel.MainViewModel
-import com.coder.challengechapter5binar.viewmodel.ViewModelFactory
+import com.coder.challengechapter7binar.R
+import com.coder.challengechapter7binar.data.datastore.UserDataStoreManager
 import com.coder.challengechapter7binar.databinding.FragmentLoginBinding
+import com.coder.challengechapter7binar.ui.home.HomeViewModel
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class LoginFragment : Fragment() {
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
-    private lateinit var repository: UserRepository
-    private lateinit var viewModel: MainViewModel
-    private lateinit var pref: UserDataStoreManager
+    private val homeViewModel: HomeViewModel by viewModels()
+//    private lateinit var repository: UserRepository
+//    private lateinit var viewModel: MainViewModel
+//    private lateinit var pref: UserDataStoreManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,12 +35,13 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        repository = UserRepository(requireContext())
+//        repository = UserRepository(requireContext())
+//
+//        pref = UserDataStoreManager(requireContext())
+//        viewModel = ViewModelProvider(requireActivity(), ViewModelFactory(pref))[MainViewModel::class.java]
 
-        pref = UserDataStoreManager(requireContext())
-        viewModel = ViewModelProvider(requireActivity(), ViewModelFactory(pref))[MainViewModel::class.java]
-
-        viewModel.getDataStore().observe(viewLifecycleOwner) {
+        homeViewModel.getDataStore()
+        homeViewModel.user.observe(viewLifecycleOwner) {
             if (it.id != UserDataStoreManager.DEFAULT_ID) {
                 findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
             }
@@ -66,28 +63,42 @@ class LoginFragment : Fragment() {
                     binding.ilPassword.error = getString(R.string.password_belum_diisi)
                 }
                 else -> {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val result = repository.getUser(etUsername.toString())
-
-                        runBlocking(Dispatchers.Main) {
-                            if (result == null) {
-                                val snackbar = Snackbar.make(it,"Login gagal, coba periksa email atau password anda", Snackbar.LENGTH_INDEFINITE)
-                                snackbar.setAction("Oke") {
-                                    snackbar.dismiss()
-                                }
-                                snackbar.show()
-                            } else {
-                                Toast.makeText(context, "Login berhasil", Toast.LENGTH_SHORT).show()
-                                findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+                    homeViewModel.getUser(etUsername.toString())
+                    homeViewModel.resultLogin.observe(viewLifecycleOwner) {
+                        if (it == null) {
+                            val snackbar = Snackbar.make(binding.root,"Login gagal, coba periksa email atau password anda", Snackbar.LENGTH_INDEFINITE)
+                            snackbar.setAction("Oke") {
+                                snackbar.dismiss()
                             }
+                            snackbar.show()
+                        } else {
+                            Toast.makeText(context, "Login berhasil", Toast.LENGTH_SHORT).show()
+                            homeViewModel.saveDataStore(it)
+                            findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
                         }
-                        if (result != null){
-                            viewModel.saveDataStore(result)
-                        }
+//                        homeViewModel.setDataUser(it)
+                    }
+//                    lifecycleScope.launch(Dispatchers.IO) {
+//                        val result = homeViewModel.login(etUsername.toString())
+//
+//                        runBlocking(Dispatchers.Main) {
+//                            if (result == null) {
+//                                val snackbar = Snackbar.make(it,"Login gagal, coba periksa email atau password anda", Snackbar.LENGTH_INDEFINITE)
+//                                snackbar.setAction("Oke") {
+//                                    snackbar.dismiss()
+//                                }
+//                                snackbar.show()
+//                            } else {
+//                                Toast.makeText(context, "Login berhasil", Toast.LENGTH_SHORT).show()
+//                                findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+//                            }
+//                        }
+//                        if (result != null){
+//                            viewModel.saveDataStore(result)
+//                        }
                     }
                 }
             }
-        }
     }
 
     override fun onDestroy() {

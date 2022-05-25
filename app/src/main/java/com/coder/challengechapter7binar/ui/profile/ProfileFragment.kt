@@ -12,27 +12,25 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.net.toUri
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.coder.challengechapter5binar.R
-import com.coder.challengechapter5binar.databinding.FragmentProfileBinding
-import com.coder.challengechapter5binar.datastore.UserDataStoreManager
-import com.coder.challengechapter5binar.room.UserEntity
-import com.coder.challengechapter5binar.room.UserRepository
+import com.coder.challengechapter7binar.R
+import com.coder.challengechapter7binar.data.room.entity.UserEntity
 import com.coder.challengechapter7binar.databinding.FragmentProfileBinding
+import com.coder.challengechapter7binar.ui.home.HomeViewModel
 import com.github.dhaval2404.imagepicker.ImagePicker
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 
+@AndroidEntryPoint
 class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
-    private lateinit var repository: UserRepository
+    private val homeViewModel: HomeViewModel by viewModels()
+//    private lateinit var repository: UserRepository
     private val args : ProfileFragmentArgs by navArgs()
-    private lateinit var pref: UserDataStoreManager
+//    private lateinit var pref: UserDataStoreManager
     private var imageUri: Uri? = null
 
     private val startForProfileImageResult =
@@ -66,9 +64,9 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        repository = UserRepository(requireContext())
-
-        pref = UserDataStoreManager(requireContext())
+//        repository = UserRepository(requireContext())
+//
+//        pref = UserDataStoreManager(requireContext())
 
         binding.profileImage.setImageURI(args.dataUser.uri.toString().toUri())
         binding.etUsername.setText(args.dataUser.username)
@@ -88,40 +86,54 @@ class ProfileFragment : Fragment() {
                 binding.etPassword.text.toString(),
                 imageUri.toString()
             )
-            lifecycleScope.launch(Dispatchers.IO) {
-                val result = repository.updateUser(user)
-                runBlocking(Dispatchers.Main) {
-                    if (result != 0){
-                        Toast.makeText(requireContext(), "Profile berhasil diupdate", Toast.LENGTH_SHORT).show()
-                    }else{
-                        Toast.makeText(requireContext(), "Profile gagal diupdate", Toast.LENGTH_SHORT).show()
+            homeViewModel.updateUser(user)
+            homeViewModel.resultUpdate.observe(viewLifecycleOwner) {
+                if (it != null) {
+                    if (it != 0) {
+                        Toast.makeText(
+                            requireContext(), "User berhasil diupdate",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        Toast.makeText(requireContext(), "User gagal diupdate", Toast.LENGTH_SHORT)
+                            .show()
                     }
                 }
+//            lifecycleScope.launch(Dispatchers.IO) {
+//                val result = repository.updateUser(user)
+//                runBlocking(Dispatchers.Main) {
+//                    if (result != 0){
+//                        Toast.makeText(requireContext(), "Profile berhasil diupdate", Toast.LENGTH_SHORT).show()
+//                    }else{
+//                        Toast.makeText(requireContext(), "Profile gagal diupdate", Toast.LENGTH_SHORT).show()
+//                    }
+//                }
+//            }
+                findNavController().navigate(R.id.action_profileFragment_to_homeFragment)
             }
-            findNavController().navigate(R.id.action_profileFragment_to_homeFragment)
-        }
 
-        binding.btnBack.setOnClickListener {
-            findNavController().navigate(R.id.action_profileFragment_to_homeFragment)
-        }
+            binding.btnBack.setOnClickListener {
+                findNavController().navigate(R.id.action_profileFragment_to_homeFragment)
+            }
 
-        binding.btnLogout.setOnClickListener {
-            AlertDialog.Builder(requireContext())
-                .setTitle("Logout")
-                .setMessage("Apakah anda yakin ingin logout?")
-                .setPositiveButton("Ya") { dialog, _ ->
-                    dialog.dismiss()
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        pref.deleteUserFromPref()
+            binding.btnLogout.setOnClickListener {
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Logout")
+                    .setMessage("Apakah anda yakin ingin logout?")
+                    .setPositiveButton("Ya") { dialog, _ ->
+                        dialog.dismiss()
+                        homeViewModel.deleteUserFromPref()
+//                        lifecycleScope.launch(Dispatchers.IO) {
+//                            pref.deleteUserFromPref()
+//                        }
+                        findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
                     }
-                    findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
-                }
-                .setNegativeButton("Batal"){ dialog, _ ->
-                    dialog.dismiss()
-                }
-                .show()
+                    .setNegativeButton("Batal") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .show()
+            }
         }
-
     }
 
     private fun openImagePicker() {

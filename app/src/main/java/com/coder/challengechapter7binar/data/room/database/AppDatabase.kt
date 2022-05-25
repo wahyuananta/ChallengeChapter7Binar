@@ -12,12 +12,13 @@ abstract class AppDatabase: RoomDatabase() {
     abstract fun userDao(): UserDao
 
     companion object {
+        const val DB_NAME = "AppDatabase.db"
         private var INSTANCE : AppDatabase? = null
 
         fun getInstance(context: Context): AppDatabase?{
             if (INSTANCE == null) {
                 synchronized(AppDatabase::class){
-                    INSTANCE = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "AppDatabase.db").build()
+                    INSTANCE = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, DB_NAME).build()
                 }
             }
             return INSTANCE
