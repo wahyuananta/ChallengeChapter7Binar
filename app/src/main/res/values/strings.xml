@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">Challenge Chapter 7 Binar</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="name_belum_diisi">Username belum diisi</string>
+    <string name="email_belum_diisi">Email belum diisi</string>
+    <string name="password_belum_diisi">Password belum diisi</string>
+    <string name="konfirmasi_password_belum_diisi">Konfirmasi password belum diisi</string>
+    <string name="password_tidak_sama">Password tidak sama</string>
+    <string name="register">Register</string>
+    <string name="username">Username</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="konfirmasi_password">Konfirmasi Password</string>
+    <string name="movie">movie</string>
+    <string name="app">app</string>
+    <string name="login">Login</string>
+    <string name="belum_punya_akun">Belum punya Akun?</string>
+    <string name="update_profile">Update Profile</string>
+    <string name="update">Update</string>
+    <string name="image_back">Image back</string>
+    <string name="image_logout">Image logout</string>
+    <string name="hello">Hello</string>
+    <string name="wahyu">Wahyu</string>
+    <string name="watch_your_favorite_movie">Watch your favorite movie</string>
+    <string name="image_profile">Image profile</string>
+    <string name="upcoming_movie">Upcoming Movie</string>
+    <string name="popular_movie">Popular Movie</string>
+    <string name="image_poster">Image poster</string>
+    <string name="title">Title</string>
+    <string name="rating">8.9</string>
+    <string name="description">Description</string>
+    <string name="tagline">Tagline</string>
+</resources>
