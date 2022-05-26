@@ -11,6 +11,7 @@ import com.coder.challengechapter7binar.data.room.entity.UserEntity
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.runBlocking
 
 import org.junit.Before
@@ -107,7 +108,7 @@ class RepositoryTest {
             runBlocking {
                 userDataStore.saveUserPref(user)
             }
-        } returns
+        } returns Unit
 
         repository.saveUserPref(user)
         verify {
@@ -119,11 +120,13 @@ class RepositoryTest {
 
     @Test
     fun getUserPref(): Unit = runBlocking {
+        val responseGetUserPref = mockk<Flow<UserEntity>>()
+
         every {
             runBlocking {
                 userDataStore.getUserPref()
             }
-        } returns
+        } returns responseGetUserPref
 
         repository.getUserPref()
         verify {
@@ -139,7 +142,7 @@ class RepositoryTest {
             runBlocking {
                 userDataStore.deleteUserFromPref()
             }
-        } returns
+        } returns Unit
 
         repository.deleteUserFromPref()
         verify {
@@ -151,7 +154,7 @@ class RepositoryTest {
 
     @Test
     fun addUser(): Unit = runBlocking {
-        val responseAddUser = mockk<Long>()
+        val responseAddUser = 1L
         val user = UserEntity(
             1,
             "test",
@@ -194,7 +197,7 @@ class RepositoryTest {
 
     @Test
     fun updateUser(): Unit = runBlocking {
-        val responseUpdateUser = mockk<Int>()
+        val responseUpdateUser = 1
         val user = UserEntity(
             1,
             "test",
