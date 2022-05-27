@@ -32,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/montserrat_regular"
-            android:text="movie"
+            android:text="@string/movie"
             android:textColor="@color/white"
             android:textSize="38sp" />
 
@@ -41,7 +41,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/montserrat_bold"
-            android:text="app"
+            android:text="@string/app"
             android:textColor="@color/white"
             android:textSize="38sp" />
 
