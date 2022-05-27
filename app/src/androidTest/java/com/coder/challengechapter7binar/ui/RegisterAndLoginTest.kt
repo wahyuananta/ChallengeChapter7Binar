@@ -58,7 +58,7 @@ class RegisterAndLoginTest {
                 isDisplayed()
             )
         )
-        appCompatEditText.perform(replaceText("a"), closeSoftKeyboard())
+        appCompatEditText.perform(replaceText("wahyu"), closeSoftKeyboard())
 
         val appCompatEditText2 = onView(
             allOf(
@@ -73,7 +73,7 @@ class RegisterAndLoginTest {
                 isDisplayed()
             )
         )
-        appCompatEditText2.perform(replaceText("a"), closeSoftKeyboard())
+        appCompatEditText2.perform(replaceText("wahyu@gmail.com"), closeSoftKeyboard())
 
         val appCompatEditText3 = onView(
             allOf(
@@ -88,7 +88,7 @@ class RegisterAndLoginTest {
                 isDisplayed()
             )
         )
-        appCompatEditText3.perform(replaceText("a"), closeSoftKeyboard())
+        appCompatEditText3.perform(replaceText("123"), closeSoftKeyboard())
 
         val appCompatEditText4 = onView(
             allOf(
@@ -103,7 +103,7 @@ class RegisterAndLoginTest {
                 isDisplayed()
             )
         )
-        appCompatEditText4.perform(replaceText("a"), closeSoftKeyboard())
+        appCompatEditText4.perform(replaceText("123"), closeSoftKeyboard())
 
         val materialButton2 = onView(
             allOf(
@@ -134,7 +134,7 @@ class RegisterAndLoginTest {
                 isDisplayed()
             )
         )
-        appCompatEditText5.perform(replaceText("a"), closeSoftKeyboard())
+        appCompatEditText5.perform(replaceText("wahyu"), closeSoftKeyboard())
 
         val appCompatEditText6 = onView(
             allOf(
@@ -149,7 +149,7 @@ class RegisterAndLoginTest {
                 isDisplayed()
             )
         )
-        appCompatEditText6.perform(replaceText("a"), closeSoftKeyboard())
+        appCompatEditText6.perform(replaceText("123"), closeSoftKeyboard())
 
         val materialButton3 = onView(
             allOf(
