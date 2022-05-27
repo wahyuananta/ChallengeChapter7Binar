@@ -37,16 +37,6 @@
             android:src="@drawable/ic_launcher_background"
             android:scaleType="centerCrop" />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/iv_favorite"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
-            android:layout_margin="16dp"
-            android:layout_gravity="end|top"
-            android:tint="@color/colorAccent"
-            android:background="@drawable/shape_circle"
-            android:src="@drawable/ic_favorite_border_black_24dp" />
-
     </FrameLayout>
 
     <androidx.cardview.widget.CardView
@@ -285,5 +275,14 @@
             android:textColor="@color/white"
             android:textSize="28sp" />
     </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/pb_loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

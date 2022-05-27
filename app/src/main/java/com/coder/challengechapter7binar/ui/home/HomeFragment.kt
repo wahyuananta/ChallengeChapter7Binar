@@ -5,29 +5,23 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.coder.challengechapter7binar.adapter.PopularMovieAdapter
 import com.coder.challengechapter7binar.adapter.UpcomingMovieAdapter
+import com.coder.challengechapter7binar.data.api.Status
 import com.coder.challengechapter7binar.data.api.model.ResultPopularMovieResponse
 import com.coder.challengechapter7binar.data.api.model.ResultUpcomingMovieResponse
 import com.coder.challengechapter7binar.data.room.entity.UserEntity
 import com.coder.challengechapter7binar.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding
     private val homeViewModel: HomeViewModel by viewModels()
-//    private lateinit var repository: UserRepository
-//    private lateinit var viewModel: HomeViewModel
-//    private lateinit var mainViewModel: MainViewModel
-//    private lateinit var pref: UserDataStoreManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,20 +34,11 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        repository = UserRepository(requireContext())
 
-//        pref = UserDataStoreManager(requireContext())
-//        mainViewModel = ViewModelProvider(requireActivity(), ViewModelFactory(pref))[MainViewModel::class.java]
-
-        homeViewModel.user.observe(viewLifecycleOwner) {
+        homeViewModel.getDataStore()
+        homeViewModel.userDataStore.observe(viewLifecycleOwner) {
             binding!!.tvUsername.text = it.username
         }
-
-//        viewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
-
-//        binding!!.btnFavorite.setOnClickListener {
-//            findNavController().navigate(R.id.action_homeFragment_to_favoriteFragment)
-//        }
 
         fetchAllUpcomingMovie()
         fetchAllPopularMovie()
@@ -61,11 +46,25 @@ class HomeFragment : Fragment() {
     }
 
     private fun fetchAllUpcomingMovie() {
-        homeViewModel.getUpcomingMovie()
         homeViewModel.upcomingMovie.observe(viewLifecycleOwner) {
-            showListUpcomingMovie(it.data?.resultsUpcomingMovieResponse)
-            binding!!.pbLoading.visibility = View.GONE
+            when(it.status){
+                Status.LOADING -> {
+                    binding!!.pbLoading.visibility = View.VISIBLE
+                    binding!!.tvUpcomingMovie.visibility = View.GONE
+                    binding!!.tvPopularMovie.visibility = View.GONE
+                }
+                Status.SUCCESS -> {
+                    binding!!.pbLoading.visibility = View.GONE
+                    binding!!.tvUpcomingMovie.visibility = View.VISIBLE
+                    binding!!.tvPopularMovie.visibility = View.VISIBLE
+                    showListUpcomingMovie(it.data?.resultsUpcomingMovieResponse)
+                }
+                Status.ERROR -> {
+                    Toast.makeText(context, "Error ${it.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
+        homeViewModel.getUpcomingMovie()
     }
 
     private fun showListUpcomingMovie(data: List<ResultUpcomingMovieResponse>?) {
@@ -77,15 +76,29 @@ class HomeFragment : Fragment() {
         })
 
         adapter.submitData(data)
-        binding!!.rvListTopRated.adapter = adapter
+        binding?.rvListTopRated?.adapter = adapter
     }
 
     private fun fetchAllPopularMovie() {
-        homeViewModel.getPopularMovie()
         homeViewModel.popularMovie.observe(viewLifecycleOwner) {
-            showListPopularMovie(it.data?.resultPopularMovieRespons)
-            binding!!.pbLoading.visibility = View.GONE
+            when(it.status){
+                Status.LOADING -> {
+                    binding!!.pbLoading.visibility = View.VISIBLE
+                    binding!!.tvUpcomingMovie.visibility = View.GONE
+                    binding!!.tvPopularMovie.visibility = View.GONE
+                }
+                Status.SUCCESS -> {
+                    binding!!.pbLoading.visibility = View.GONE
+                    binding!!.tvUpcomingMovie.visibility = View.VISIBLE
+                    binding!!.tvPopularMovie.visibility = View.VISIBLE
+                    showListPopularMovie(it.data?.resultPopularMovieRespons)
+                }
+                Status.ERROR -> {
+                    Toast.makeText(context, "Error ${it.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
+        homeViewModel.getPopularMovie()
     }
 
     private fun showListPopularMovie(data: List<ResultPopularMovieResponse>?) {
@@ -97,12 +110,13 @@ class HomeFragment : Fragment() {
         })
 
         adapter.submitData(data)
-        binding!!.rvListPopular.adapter = adapter
+        binding?.rvListPopular?.adapter = adapter
     }
 
     private fun updateUser(){
-        binding!!.btnUpdate.setOnClickListener {
-            homeViewModel.resultLogin.observe(viewLifecycleOwner) {
+        binding?.btnUpdate?.setOnClickListener {
+            homeViewModel.getUser(binding?.tvUsername?.text.toString())
+            homeViewModel.getDataUser.observe(viewLifecycleOwner) {
                 if (it != null) {
                     val user = UserEntity(
                         it.id,
@@ -113,13 +127,7 @@ class HomeFragment : Fragment() {
                     )
                     val navigateUpdate = HomeFragmentDirections.actionHomeFragmentToProfileFragment(user)
                     findNavController().navigate(navigateUpdate)
-            }
-//            lifecycleScope.launch(Dispatchers.IO) {
-//                val dataUser = homeViewModel.login(binding!!.tvUsername.text.toString())
-//                runBlocking(Dispatchers.Main) {
-//
-//                    }
-//                }
+                }
             }
         }
     }

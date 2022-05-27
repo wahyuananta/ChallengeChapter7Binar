@@ -12,20 +12,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
-//    val upcomingMovie: MutableLiveData<UpcomingMoviesResponse> = MutableLiveData()
-//    val popularMovie: MutableLiveData<PopularMovieResponse> = MutableLiveData()
 
-    private val  _resultRegister : MutableLiveData<Long> = MutableLiveData()
-    val resultRegister : LiveData<Long> get() = _resultRegister
+    private val  _getDataUser : MutableLiveData<UserEntity> = MutableLiveData()
+    val getDataUser : LiveData<UserEntity> get() = _getDataUser
 
-    private val _resultUpdate :  MutableLiveData<Int> = MutableLiveData()
-    val resultUpdate :LiveData<Int> get() = _resultUpdate
-
-    private val  _resultLogin : MutableLiveData<UserEntity> = MutableLiveData()
-    val resultLogin : LiveData<UserEntity> get() = _resultLogin
-
-    private val _user: MutableLiveData<UserEntity> = MutableLiveData()
-    val user: LiveData<UserEntity> get() = _user
+    private val _userDataStore: MutableLiveData<UserEntity> = MutableLiveData()
+    val userDataStore: LiveData<UserEntity> get() = _userDataStore
 
     private val _popularMovie: MutableLiveData<Resource<PopularMovieResponse>> = MutableLiveData()
     val popularMovie: LiveData<Resource<PopularMovieResponse>> get() = _popularMovie
@@ -33,41 +25,17 @@ class HomeViewModel @Inject constructor(private val repository: Repository) : Vi
     private val _upcomingMovie: MutableLiveData<Resource<UpcomingMoviesResponse>> = MutableLiveData()
     val upcomingMovie: LiveData<Resource<UpcomingMoviesResponse>> get() = _upcomingMovie
 
-    fun addUser(user: UserEntity){
-        viewModelScope.launch {
-            _resultRegister.value = repository.addUser(user)
-        }
-    }
-
     fun getDataStore() {
         viewModelScope.launch {
             repository.getUserPref().collect {
-                _user.value = it
+                _userDataStore.value = it
             }
-        }
-    }
-
-    fun deleteUserFromPref() {
-        viewModelScope.launch {
-            repository.deleteUserFromPref()
-        }
-    }
-
-    fun saveDataStore(user: UserEntity) {
-        viewModelScope.launch {
-            repository.saveUserPref(user)
         }
     }
 
     fun getUser(username: String) {
         viewModelScope.launch {
-            _resultLogin.value = repository.getUser(username)
-        }
-    }
-
-    fun updateUser(user:UserEntity){
-        viewModelScope.launch {
-            _resultUpdate.value = repository.updateUser(user)
+            _getDataUser.value = repository.getUser(username)
         }
     }
 
@@ -80,21 +48,6 @@ class HomeViewModel @Inject constructor(private val repository: Repository) : Vi
                 _upcomingMovie.postValue(Resource.error(exception.localizedMessage?:"Error occured"))
             }
         }
-//        ApiClient.getInstance(getApplication()).getUpcomingMovie().enqueue(object : Callback<UpcomingMoviesResponse> {
-//            override fun onResponse(
-//                call: Call<UpcomingMoviesResponse>,
-//                response: Response<UpcomingMoviesResponse>
-//            ) {
-//                response.body()?.let {
-//                    upcomingMovie.postValue(it)
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<UpcomingMoviesResponse>, t: Throwable) {
-//                Log.d("UpcomingViewModel", "${t.message}")
-//            }
-//
-//        })
     }
 
     fun getPopularMovie() {
@@ -106,20 +59,5 @@ class HomeViewModel @Inject constructor(private val repository: Repository) : Vi
                 _popularMovie.postValue(Resource.error(exception.localizedMessage?:"Error occured"))
             }
         }
-//        ApiClient.getInstance(getApplication()).getPopularMovie().enqueue(object : Callback<PopularMovieResponse> {
-//            override fun onResponse(
-//                call: Call<PopularMovieResponse>,
-//                response: Response<PopularMovieResponse>
-//            ) {
-//            response.body()?.let {
-//                popularMovie.postValue(it)
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<PopularMovieResponse>, t: Throwable) {
-//                Log.d("PopularViewModel", "${t.message}")
-//            }
-//
-//        })
     }
 }

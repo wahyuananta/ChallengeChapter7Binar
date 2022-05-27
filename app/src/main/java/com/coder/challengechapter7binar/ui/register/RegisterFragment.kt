@@ -13,7 +13,6 @@ import androidx.navigation.fragment.findNavController
 import com.coder.challengechapter7binar.R
 import com.coder.challengechapter7binar.data.room.entity.UserEntity
 import com.coder.challengechapter7binar.databinding.FragmentRegisterBinding
-import com.coder.challengechapter7binar.ui.home.HomeViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -21,8 +20,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class RegisterFragment : Fragment() {
     private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding!!
-    private val homeViewModel: HomeViewModel by viewModels()
-//    private lateinit var repository: UserRepository
+    private val registerViewModel: RegisterViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,7 +33,6 @@ class RegisterFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        repository = UserRepository(requireContext())
 
         binding.btnRegister.setOnClickListener {
             val imageUri: Uri = Uri.parse(
@@ -51,26 +48,32 @@ class RegisterFragment : Fragment() {
 
             when {
                 username.isNullOrEmpty() -> {
-                    binding.ilUsername.error = getString(R.string.name_belum_diisi)
+                    Toast.makeText(requireContext(), getString(R.string.name_belum_diisi), Toast.LENGTH_SHORT).show()
+//                    binding.ilUsername.error = getString(R.string.name_belum_diisi)
                 }
                 email.isNullOrEmpty() -> {
-                    binding.ilEmail.error = getString(R.string.email_belum_diisi)
+                    Toast.makeText(requireContext(), getString(R.string.email_belum_diisi), Toast.LENGTH_SHORT).show()
+//                    binding.ilEmail.error = getString(R.string.email_belum_diisi)
                 }
                 password.isNullOrEmpty() -> {
-                    binding.ilPassword.error = getString(R.string.password_belum_diisi)
+                    Toast.makeText(requireContext(), getString(R.string.password_belum_diisi), Toast.LENGTH_SHORT).show()
+//                    binding.ilPassword.error = getString(R.string.password_belum_diisi)
                 }
                 konfirmasiPassword.isNullOrEmpty() -> {
-                    binding.ilKonfirmasiPassword.error = getString(R.string.konfirmasi_password_belum_diisi)
+                    Toast.makeText(requireContext(), getString(R.string.konfirmasi_password_belum_diisi), Toast.LENGTH_SHORT).show()
+//                    binding.ilKonfirmasiPassword.error = getString(R.string.konfirmasi_password_belum_diisi)
                 }
                 password.toString().lowercase() != konfirmasiPassword.toString().lowercase() -> {
-                    binding.ilKonfirmasiPassword.error = getString(R.string.password_tidak_sama)
+                    Toast.makeText(requireContext(), getString(R.string.password_tidak_sama), Toast.LENGTH_SHORT).show()
+//                    binding.ilKonfirmasiPassword.error = getString(R.string.password_tidak_sama)
                 }
                 else -> {
                     val user = UserEntity(null, username.toString(), email.toString(), password.toString(), imageUri.toString())
-                    homeViewModel.addUser(user)
-                    homeViewModel.resultRegister.observe(viewLifecycleOwner) {
+                    registerViewModel.addUser(user)
+                    registerViewModel.register.observe(viewLifecycleOwner) {
                         if (it != 0.toLong()) {
-                            Toast.makeText(activity, "Registrasi berhasil", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Registrasi berhasil", Toast.LENGTH_SHORT).show()
+                            findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
                         } else {
                             val snackbar = Snackbar.make(binding.root,"Registrasi gagal, coba lagi nanti!", Snackbar.LENGTH_INDEFINITE)
                             snackbar.setAction("Oke") {
@@ -79,24 +82,8 @@ class RegisterFragment : Fragment() {
                             snackbar.show()
                         }
                     }
-//                    lifecycleScope.launch(Dispatchers.IO) {
-//                        val result= repository.addUser(user)
-//                        runBlocking(Dispatchers.Main) {
-//                            if (result != 0.toLong()) {
-//                                Toast.makeText(activity, "Registrasi berhasil", Toast.LENGTH_SHORT).show()
-//                            } else {
-//                                val snackbar = Snackbar.make(it,"Registrasi gagal, coba lagi nanti!", Snackbar.LENGTH_INDEFINITE)
-//                                snackbar.setAction("Oke") {
-//                                    snackbar.dismiss()
-//                                }
-//                                snackbar.show()
-//                            }
-//                        }
-//                    }
-                    findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
                 }
             }
-
         }
     }
 

@@ -11,7 +11,6 @@ import androidx.navigation.fragment.findNavController
 import com.coder.challengechapter7binar.R
 import com.coder.challengechapter7binar.data.datastore.UserDataStoreManager
 import com.coder.challengechapter7binar.databinding.FragmentLoginBinding
-import com.coder.challengechapter7binar.ui.home.HomeViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -19,10 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class LoginFragment : Fragment() {
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
-    private val homeViewModel: HomeViewModel by viewModels()
-//    private lateinit var repository: UserRepository
-//    private lateinit var viewModel: MainViewModel
-//    private lateinit var pref: UserDataStoreManager
+    private val loginViewModel: LoginViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,19 +31,15 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        repository = UserRepository(requireContext())
-//
-//        pref = UserDataStoreManager(requireContext())
-//        viewModel = ViewModelProvider(requireActivity(), ViewModelFactory(pref))[MainViewModel::class.java]
 
-        homeViewModel.getDataStore()
-        homeViewModel.user.observe(viewLifecycleOwner) {
+        loginViewModel.getDataStore()
+        loginViewModel.userDataStore.observe(viewLifecycleOwner) {
             if (it.id != UserDataStoreManager.DEFAULT_ID) {
                 findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
             }
         }
 
-        binding.tvRegister.setOnClickListener {
+        binding.btnRegister.setOnClickListener {
             findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
         }
 
@@ -57,48 +49,35 @@ class LoginFragment : Fragment() {
 
             when {
                 etUsername.isNullOrEmpty() -> {
-                    binding.ilUsername.error = getString(R.string.email_belum_diisi)
+                    Toast.makeText(requireContext(), getString(R.string.name_belum_diisi), Toast.LENGTH_SHORT).show()
+//                    binding.ilUsername.error = getString(R.string.email_belum_diisi)
                 }
                 etPassword.isNullOrEmpty() -> {
-                    binding.ilPassword.error = getString(R.string.password_belum_diisi)
+                    Toast.makeText(requireContext(), getString(R.string.password_belum_diisi), Toast.LENGTH_SHORT).show()
+//                    binding.ilPassword.error = getString(R.string.password_belum_diisi)
                 }
                 else -> {
-                    homeViewModel.getUser(etUsername.toString())
-                    homeViewModel.resultLogin.observe(viewLifecycleOwner) {
+                    loginViewModel.getUser(etUsername.toString())
+                    loginViewModel.login.observe(viewLifecycleOwner) {
                         if (it == null) {
-                            val snackbar = Snackbar.make(binding.root,"Login gagal, coba periksa email atau password anda", Snackbar.LENGTH_INDEFINITE)
+                            val snackbar = Snackbar.make(
+                                binding.root,
+                                "Login gagal, coba periksa email atau password anda",
+                                Snackbar.LENGTH_INDEFINITE
+                            )
                             snackbar.setAction("Oke") {
                                 snackbar.dismiss()
                             }
                             snackbar.show()
                         } else {
+                            loginViewModel.saveDataStore(it)
                             Toast.makeText(context, "Login berhasil", Toast.LENGTH_SHORT).show()
-                            homeViewModel.saveDataStore(it)
                             findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
                         }
-//                        homeViewModel.setDataUser(it)
-                    }
-//                    lifecycleScope.launch(Dispatchers.IO) {
-//                        val result = homeViewModel.login(etUsername.toString())
-//
-//                        runBlocking(Dispatchers.Main) {
-//                            if (result == null) {
-//                                val snackbar = Snackbar.make(it,"Login gagal, coba periksa email atau password anda", Snackbar.LENGTH_INDEFINITE)
-//                                snackbar.setAction("Oke") {
-//                                    snackbar.dismiss()
-//                                }
-//                                snackbar.show()
-//                            } else {
-//                                Toast.makeText(context, "Login berhasil", Toast.LENGTH_SHORT).show()
-//                                findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
-//                            }
-//                        }
-//                        if (result != null){
-//                            viewModel.saveDataStore(result)
-//                        }
                     }
                 }
             }
+        }
     }
 
     override fun onDestroy() {

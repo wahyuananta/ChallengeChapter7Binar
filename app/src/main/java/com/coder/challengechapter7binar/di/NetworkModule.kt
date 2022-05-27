@@ -23,13 +23,13 @@ private const val BASE_URL = "https://api.themoviedb.org/3/"
 @InstallIn(SingletonComponent::class)
 class NetworkModule {
 
-//    @Singleton
-//    @Provides
-//    fun provideLoggingInterceptor():HttpLoggingInterceptor{
-//        return HttpLoggingInterceptor().apply {
-//            level = HttpLoggingInterceptor.Level.BODY
-//        }
-//    }
+    @Singleton
+    @Provides
+    fun provideLoggingInterceptor():HttpLoggingInterceptor{
+        return HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+    }
 
     @Singleton
     @Provides
@@ -47,11 +47,11 @@ class NetworkModule {
     @Singleton
     @Provides
     fun provideOkHttp(
-//        httpLoggingInterceptor: HttpLoggingInterceptor,
+        httpLoggingInterceptor: HttpLoggingInterceptor,
         chuckerInterceptor: ChuckerInterceptor
     ):OkHttpClient{
         return OkHttpClient.Builder()
-//            .addInterceptor(httpLoggingInterceptor)
+            .addInterceptor(httpLoggingInterceptor)
             .addInterceptor { chain ->
                 val original = chain.request()
                 val url = original.url.newBuilder()
