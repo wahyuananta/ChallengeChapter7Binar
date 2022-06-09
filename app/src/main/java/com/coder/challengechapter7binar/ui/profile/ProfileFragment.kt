@@ -1,6 +1,5 @@
 package com.coder.challengechapter7binar.ui.profile
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.net.Uri
 import android.os.Bundle
@@ -9,18 +8,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.coder.challengechapter7binar.R
 import com.coder.challengechapter7binar.data.room.entity.UserEntity
 import com.coder.challengechapter7binar.databinding.FragmentProfileBinding
-import com.github.dhaval2404.imagepicker.ImagePicker
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.File
 
 @AndroidEntryPoint
 class ProfileFragment : Fragment() {
@@ -42,15 +36,10 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.profileImage.setImageURI(args.dataUser.uri.toString().toUri())
         binding.etUsername.setText(args.dataUser.username)
         binding.etUsername.isFocusable = false
         binding.etEmail.setText(args.dataUser.email)
         binding.etPassword.setText(args.dataUser.password)
-
-        binding.profileImage.setOnClickListener {
-            openImagePicker()
-        }
 
         binding.btnUpdate.setOnClickListener {
             val user = UserEntity(
@@ -96,50 +85,4 @@ class ProfileFragment : Fragment() {
                 .show()
         }
     }
-
-    private val startForProfileImageResult =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-            val resultCode = result.resultCode
-            val data = result.data
-            when (resultCode) {
-                Activity.RESULT_OK -> {
-                    //Image Uri will not be null for RESULT_OK
-                    imageUri = data?.data
-                    loadImage(imageUri)
-
-                }
-                ImagePicker.RESULT_ERROR -> {
-                    Toast.makeText(activity, ImagePicker.getError(data), Toast.LENGTH_SHORT).show()
-                }
-                else -> {
-
-                }
-            }
-        }
-
-    private fun openImagePicker() {
-        ImagePicker.with(this)
-            .crop()
-            .saveDir(
-                File(
-                    requireContext().externalCacheDir,
-                    "ImagePicker"
-                )
-            ) //Crop image(Optional), Check Customization for more option
-            .compress(1024)            //Final image size will be less than 1 MB(Optional)
-            .maxResultSize(
-                1080,
-                1080
-            )    //Final image resolution will be less than 1080 x 1080(Optional)
-            .createIntent { intent ->
-                startForProfileImageResult.launch(intent)
-            }
-    }
-
-    private fun loadImage(uri: Uri?) {
-        uri?.let {
-            binding.profileImage.setImageURI(it)
-        }
-    }
-
 }
