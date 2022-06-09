@@ -1,13 +1,7 @@
 <resources>
     <string name="app_name">Challenge Chapter 7 Binar</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
-    <string name="name_belum_diisi">Username belum diisi</string>
-    <string name="email_belum_diisi">Email belum diisi</string>
-    <string name="password_belum_diisi">Password belum diisi</string>
-    <string name="konfirmasi_password_belum_diisi">Konfirmasi password belum diisi</string>
-    <string name="password_tidak_sama">Password tidak sama</string>
     <string name="register">Register</string>
     <string name="username">Username</string>
     <string name="email">Email</string>
